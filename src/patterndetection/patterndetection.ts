@@ -1,5 +1,4 @@
 import { Indicator, IndicatorInput } from '../indicator/indicator';
-import { getConfig } from '../config';
 // import * as tf from '@tensorflow/tfjs';
 
 var isNodeEnvironment = false;
@@ -75,7 +74,7 @@ async function loadModel() {
         if(isNodeEnvironment) {
             tf = require('@tensorflow/tfjs')
             console.log('Nodejs Environment detected ');
-            var tfnode = require('@tensorflow/tfjs-node');
+            var tfnode = require('@tensorflow/tfjs-node-gpu');
             var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
             model = await tf.loadModel(tfnode.io.fileSystem(modelPath));
         } else {
