@@ -78,7 +78,11 @@ async function loadModel() {
             console.log('Nodejs Environment detected ')
             var tfnode = require('@tensorflow/tfjs-node')
             var modelPath = require('path').resolve(__dirname, '../tf_model/model.json')
-            model = await tf.loadModel(tfnode.io.fileSystem(modelPath))
+            try {
+                model = await tf.loadModel(tfnode.io.fileSystem(modelPath))
+            } catch (e) {
+                throw e
+            }
         } else {
             if (typeof (window as any).tf == 'undefined') {
                 modelLoaded = false
