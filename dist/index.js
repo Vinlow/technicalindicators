@@ -3888,9 +3888,10 @@ function interpolateArray(data, fitCount) {
     newData[fitCount - 1] = data[data.length - 1]; // for new allocation
     return newData;
 }
-
 function l2Normalize(arr) {
-    var sum = arr.reduce((cum, value) => { return cum + (value * value); }, 0);
+    var sum = arr.reduce((cum, value) => {
+        return cum + value * value;
+    }, 0);
     var norm = Math.sqrt(sum);
     return arr.map((v) => v / norm);
 }
@@ -3908,14 +3909,20 @@ function loadModel() {
         loadingPromise = new Promise(function (resolve, reject) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (isNodeEnvironment) {
-                    tf = require('@tensorflow/tfjs');
-                    console.log('Nodejs Environment detected ');
-                    var tfnode = require('@tensorflow/tfjs-node-gpu');
-                    var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
-                    model = yield tf.loadModel(tfnode.io.fileSystem(modelPath));
+                    try {
+                        tf = require('@tensorflow/tfjs');
+                        console.log('Nodejs Environment detected ');
+                        var tfnode = require('@tensorflow/tfjs-node');
+                        var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
+                        model = yield tf.loadModel(tfnode.io.fileSystem(modelPath));
+                    }
+                    catch (e) {
+                        console.log('CPU Error acched');
+                        console.error(e);
+                    }
                 }
                 else {
-                    if (typeof window.tf == "undefined") {
+                    if (typeof window.tf == 'undefined') {
                         modelLoaded = false;
                         laodingModel = false;
                         console.log('Tensorflow js not imported, pattern detection may not work');
@@ -3960,37 +3967,37 @@ function predictPattern(input) {
 function hasDoubleBottom(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.DB);
+        return result.patternId === exports.AvailablePatterns.DB;
     });
 }
 function hasDoubleTop(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.DT);
+        return result.patternId === exports.AvailablePatterns.DT;
     });
 }
 function hasHeadAndShoulder(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.HS);
+        return result.patternId === exports.AvailablePatterns.HS;
     });
 }
 function hasInverseHeadAndShoulder(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.IHS);
+        return result.patternId === exports.AvailablePatterns.IHS;
     });
 }
 function isTrendingUp(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.TU);
+        return result.patternId === exports.AvailablePatterns.TU;
     });
 }
 function isTrendingDown(input) {
     return __awaiter(this, void 0, void 0, function* () {
         var result = yield predictPattern(input);
-        return (result.patternId === exports.AvailablePatterns.TD);
+        return result.patternId === exports.AvailablePatterns.TD;
     });
 }
 class PatternDetector extends Indicator {
