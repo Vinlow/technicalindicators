@@ -65,13 +65,13 @@ export class PatternDetectorOutput {
 }
 
 var modelLoaded = false
-var laodingModel = false
+var loadingModel = false
 var loadingPromise
 
 async function loadModel() {
     if (modelLoaded) return Promise.resolve(true)
-    if (laodingModel) return loadingPromise
-    laodingModel = true
+    if (loadingModel) return loadingPromise
+    loadingModel = true
     loadingPromise = new Promise(async function(resolve, reject) {
         if (isNodeEnvironment) {
             tf = require('@tensorflow/tfjs')
@@ -81,12 +81,12 @@ async function loadModel() {
             try {
                 model = await tf.loadModel(tfnode.io.fileSystem(modelPath))
             } catch (e) {
-                throw e
+                reject(e)
             }
         } else {
             if (typeof (window as any).tf == 'undefined') {
                 modelLoaded = false
-                laodingModel = false
+                loadingModel = false
                 console.log('Tensorflow js not imported, pattern detection may not work')
                 resolve()
                 return
@@ -96,13 +96,13 @@ async function loadModel() {
             console.log('Loading model ....')
             model = await tf.loadModel('/tf_model/model.json')
             modelLoaded = true
-            laodingModel = false
+            loadingModel = false
             setTimeout(resolve, 1000)
             console.log('Loaded model')
             return
         }
         modelLoaded = true
-        laodingModel = false
+        loadingModel = false
         resolve()
         return
     })
@@ -114,10 +114,19 @@ async function loadModel() {
     return
 }
 
-loadModel()
+try {
+    loadModel()
+} catch (e) {
+    // Error while loading TF-Model
+}
 
 export async function predictPattern(input: PatternDetectorInput): Promise<PatternDetectorOutput> {
-    await loadModel()
+    try {
+        await loadModel()
+    } catch (e) {
+        // Error while loading TF-Model
+    }
+
     if (input.values.length < 300) {
         console.warn('Pattern detector requires atleast 300 data points for a reliable prediction, received just ', input.values.length)
     }
