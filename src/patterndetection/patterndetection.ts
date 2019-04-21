@@ -74,16 +74,11 @@ async function loadModel() {
     laodingModel = true
     loadingPromise = new Promise(async function(resolve, reject) {
         if (isNodeEnvironment) {
-            try {
-                tf = require('@tensorflow/tfjs')
-                console.log('Nodejs Environment detected ')
-                var tfnode = require('@tensorflow/tfjs-node')
-                var modelPath = require('path').resolve(__dirname, '../tf_model/model.json')
-                model = await tf.loadModel(tfnode.io.fileSystem(modelPath))
-            } catch (e) {
-                console.log('CPU Error acched')
-                console.error(e)
-            }
+            tf = require('@tensorflow/tfjs')
+            console.log('Nodejs Environment detected ')
+            var tfnode = require('@tensorflow/tfjs-node')
+            var modelPath = require('path').resolve(__dirname, '../tf_model/model.json')
+            model = await tf.loadModel(tfnode.io.fileSystem(modelPath))
         } else {
             if (typeof (window as any).tf == 'undefined') {
                 modelLoaded = false
@@ -107,7 +102,11 @@ async function loadModel() {
         resolve()
         return
     })
-    await loadingPromise
+    try {
+        await loadingPromise
+    } catch (e) {
+        // Error while loading TF-Lib
+    }
     return
 }
 

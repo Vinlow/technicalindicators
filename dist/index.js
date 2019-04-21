@@ -3909,17 +3909,11 @@ function loadModel() {
         loadingPromise = new Promise(function (resolve, reject) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (isNodeEnvironment) {
-                    try {
-                        tf = require('@tensorflow/tfjs');
-                        console.log('Nodejs Environment detected ');
-                        var tfnode = require('@tensorflow/tfjs-node');
-                        var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
-                        model = yield tf.loadModel(tfnode.io.fileSystem(modelPath));
-                    }
-                    catch (e) {
-                        console.log('CPU Error acched');
-                        console.error(e);
-                    }
+                    tf = require('@tensorflow/tfjs');
+                    console.log('Nodejs Environment detected ');
+                    var tfnode = require('@tensorflow/tfjs-node');
+                    var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
+                    model = yield tf.loadModel(tfnode.io.fileSystem(modelPath));
                 }
                 else {
                     if (typeof window.tf == 'undefined') {
@@ -3945,7 +3939,12 @@ function loadModel() {
                 return;
             });
         });
-        yield loadingPromise;
+        try {
+            yield loadingPromise;
+        }
+        catch (e) {
+            // Error while loading TF-Lib
+        }
         return;
     });
 }
