@@ -75,7 +75,6 @@ async function loadModel() {
     loadingPromise = new Promise(async function(resolve, reject) {
         if (isNodeEnvironment) {
             tf = require('@tensorflow/tfjs')
-            console.log('Nodejs Environment detected ')
             var tfnode = require('@tensorflow/tfjs-node')
             var modelPath = require('path').resolve(__dirname, '../tf_model/model.json')
             try {
@@ -128,7 +127,10 @@ export async function predictPattern(input: PatternDetectorInput): Promise<Patte
     }
 
     if (input.values.length < 300) {
-        console.warn('Pattern detector requires atleast 300 data points for a reliable prediction, received just ', input.values.length)
+        console.warn(
+            'Pattern detector requires atleast 300 data points for a reliable prediction, received just ',
+            input.values.length
+        )
     }
     Indicator.reverseInputs(input)
     var values = input.values

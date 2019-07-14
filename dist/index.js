@@ -3910,7 +3910,6 @@ function loadModel() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (isNodeEnvironment) {
                     tf = require('@tensorflow/tfjs');
-                    console.log('Nodejs Environment detected ');
                     var tfnode = require('@tensorflow/tfjs-node');
                     var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
                     try {
