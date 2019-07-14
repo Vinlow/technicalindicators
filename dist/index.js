@@ -3896,76 +3896,8 @@ function l2Normalize(arr) {
     return arr.map((v) => v / norm);
 }
 
-var modelLoaded = false;
-var loadingModel = false;
-var loadingPromise;
-function loadModel() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (modelLoaded)
-            return Promise.resolve(true);
-        if (loadingModel)
-            return loadingPromise;
-        loadingModel = true;
-        loadingPromise = new Promise(function (resolve, reject) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (isNodeEnvironment) {
-                    tf = require('@tensorflow/tfjs');
-                    var tfnode = require('@tensorflow/tfjs-node');
-                    var modelPath = require('path').resolve(__dirname, '../tf_model/model.json');
-                    try {
-                        model = yield tf.loadModel(tfnode.io.fileSystem(modelPath));
-                    }
-                    catch (e) {
-                        reject(e);
-                    }
-                }
-                else {
-                    if (typeof window.tf == 'undefined') {
-                        modelLoaded = false;
-                        loadingModel = false;
-                        console.log('Tensorflow js not imported, pattern detection may not work');
-                        resolve();
-                        return;
-                    }
-                    tf = window.tf;
-                    console.log('Browser Environment detected ', tf);
-                    console.log('Loading model ....');
-                    model = yield tf.loadModel('/tf_model/model.json');
-                    modelLoaded = true;
-                    loadingModel = false;
-                    setTimeout(resolve, 1000);
-                    console.log('Loaded model');
-                    return;
-                }
-                modelLoaded = true;
-                loadingModel = false;
-                resolve();
-                return;
-            });
-        });
-        try {
-            yield loadingPromise;
-        }
-        catch (e) {
-            // Error while loading TF-Lib
-        }
-        return;
-    });
-}
-try {
-    loadModel();
-}
-catch (e) {
-    // Error while loading TF-Model
-}
 function predictPattern(input) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield loadModel();
-        }
-        catch (e) {
-            // Error while loading TF-Model
-        }
         if (input.values.length < 300) {
             console.warn('Pattern detector requires atleast 300 data points for a reliable prediction, received just ', input.values.length);
         }
